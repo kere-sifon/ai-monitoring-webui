@@ -30,10 +30,22 @@ describe('NavbarComponent', () => {
 
   beforeEach(async () => {
     const currentUserSubject = new BehaviorSubject<User | null>(null);
-    const authServiceSpy = jasmine.createSpyObj('AuthService', ['logout'], {
+    const authServiceSpy = jasmine.createSpyObj('AuthService', ['logout', 'hasRole'], {
       currentUser$: currentUserSubject.asObservable()
     });
+    // Store the subject reference for test access
+    (authServiceSpy as any).currentUserSubject = currentUserSubject;
     const alertServiceSpy = jasmine.createSpyObj('AlertService', ['getStatistics']);
+    alertServiceSpy.getStatistics.and.returnValue(of({
+      totalAlerts: 0,
+      activeAlerts: 0,
+      acknowledgedAlerts: 0,
+      resolvedAlerts: 0,
+      criticalAlerts: 0,
+      highAlerts: 0,
+      mediumAlerts: 0,
+      lowAlerts: 0
+    }));
 
     await TestBed.configureTestingModule({
       imports: [NavbarComponent, BrowserAnimationsModule],
@@ -62,7 +74,7 @@ describe('NavbarComponent', () => {
     fixture.detectChanges();
     expect(component.currentUser).toBeNull();
 
-    (authService.currentUser$ as BehaviorSubject<User | null>).next(mockUser);
+    (authService as any).currentUserSubject.next(mockUser);
     expect(component.currentUser).toEqual(mockUser);
   });
 

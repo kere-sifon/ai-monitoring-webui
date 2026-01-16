@@ -28,6 +28,14 @@ Thumbs.db
 # Coverage
 coverage/
 *.lcov
+.nyc_output/
+
+# Cache directories
+.cache/
+.angular/
+.karma/
+node_modules/.cache/
+*.cache
 
 # Python
 __pycache__/

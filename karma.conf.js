@@ -42,7 +42,20 @@ module.exports = function (config) {
       }
     },
     reporters: ['progress', 'kjhtml', 'coverage'],
-    browsers: ['Chrome'],
+    browsers: ['Chrome', 'ChromeHeadless'],
+    customLaunchers: {
+      ChromeHeadless: {
+        base: 'Chrome',
+        flags: [
+          '--headless',
+          '--disable-gpu',
+          '--no-sandbox',
+          '--disable-dev-shm-usage',
+          '--disable-extensions',
+          '--disable-web-security'
+        ]
+      }
+    },
     restartOnFileChange: true
   });
 };

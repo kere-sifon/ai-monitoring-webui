@@ -41,7 +41,9 @@ describe('Auth Guards', () => {
     it('should allow access when authenticated', async () => {
       isAuthenticatedSubject.next(true);
 
-      const result = authGuard({} as any, { url: '/protected' } as any);
+      const result = TestBed.runInInjectionContext(() => 
+        authGuard({} as any, { url: '/protected' } as any)
+      );
       const allowed = await firstValueFrom(result as any);
       
       expect(allowed).toBe(true);
@@ -51,7 +53,9 @@ describe('Auth Guards', () => {
     it('should redirect to login when not authenticated', async () => {
       isAuthenticatedSubject.next(false);
 
-      const result = authGuard({} as any, { url: '/protected' } as any);
+      const result = TestBed.runInInjectionContext(() => 
+        authGuard({} as any, { url: '/protected' } as any)
+      );
       const allowed = await firstValueFrom(result as any);
       
       expect(allowed).toBe(false);
@@ -65,7 +69,9 @@ describe('Auth Guards', () => {
       authService.hasAnyRole.and.returnValue(true);
 
       const guard = roleGuard(['admin']);
-      const result = guard({} as any, { url: '/admin' } as any);
+      const result = TestBed.runInInjectionContext(() => 
+        guard({} as any, { url: '/admin' } as any)
+      );
       const allowed = await firstValueFrom(result as any);
       
       expect(allowed).toBe(true);
@@ -78,7 +84,9 @@ describe('Auth Guards', () => {
       authService.hasAnyRole.and.returnValue(false);
 
       const guard = roleGuard(['admin']);
-      const result = guard({} as any, { url: '/admin' } as any);
+      const result = TestBed.runInInjectionContext(() => 
+        guard({} as any, { url: '/admin' } as any)
+      );
       const allowed = await firstValueFrom(result as any);
       
       expect(allowed).toBe(false);
@@ -89,7 +97,9 @@ describe('Auth Guards', () => {
       isAuthenticatedSubject.next(false);
 
       const guard = roleGuard(['admin']);
-      const result = guard({} as any, { url: '/admin' } as any);
+      const result = TestBed.runInInjectionContext(() => 
+        guard({} as any, { url: '/admin' } as any)
+      );
       const allowed = await firstValueFrom(result as any);
       
       expect(allowed).toBe(false);
@@ -101,7 +111,9 @@ describe('Auth Guards', () => {
     it('should allow access when not authenticated', async () => {
       isAuthenticatedSubject.next(false);
 
-      const result = guestGuard({} as any, { url: '/login' } as any);
+      const result = TestBed.runInInjectionContext(() => 
+        guestGuard({} as any, { url: '/login' } as any)
+      );
       const allowed = await firstValueFrom(result as any);
       
       expect(allowed).toBe(true);
@@ -111,7 +123,9 @@ describe('Auth Guards', () => {
     it('should redirect to dashboard when authenticated', async () => {
       isAuthenticatedSubject.next(true);
 
-      const result = guestGuard({} as any, { url: '/login' } as any);
+      const result = TestBed.runInInjectionContext(() => 
+        guestGuard({} as any, { url: '/login' } as any)
+      );
       const allowed = await firstValueFrom(result as any);
       
       expect(allowed).toBe(false);

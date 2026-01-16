@@ -42,7 +42,23 @@ describe('SidebarComponent', () => {
     authService = TestBed.inject(AuthService) as jasmine.SpyObj<AuthService>;
     alertService = TestBed.inject(AlertService) as jasmine.SpyObj<AlertService>;
     router = TestBed.inject(Router);
-    (router as any).events = routerEvents.asObservable();
+    
+    // Mock router.events using Object.defineProperty since it's read-only
+    Object.defineProperty(router, 'events', {
+      get: () => routerEvents.asObservable(),
+      configurable: true
+    });
+    
+    alertService.getStatistics.and.returnValue(of({
+      totalAlerts: 0,
+      activeAlerts: 0,
+      acknowledgedAlerts: 0,
+      resolvedAlerts: 0,
+      criticalAlerts: 0,
+      highAlerts: 0,
+      mediumAlerts: 0,
+      lowAlerts: 0
+    }));
   });
 
   it('should create', () => {
