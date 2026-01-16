@@ -57,7 +57,7 @@
 
           <!-- Forgot Password Link -->
           <div class="forgot-password">
-            <a (click)="goToForgotPassword()" (keydown.enter)="goToForgotPassword()" (keydown.space)="goToForgotPassword(); $event.preventDefault()" class="link" tabindex="0" role="button">Forgot password?</a>
+            <button type="button" (click)="goToForgotPassword()" class="link">Forgot password?</button>
           </div>
 
           <!-- Submit Button -->
@@ -77,7 +77,7 @@
       <mat-card-footer>
         <div class="register-link">
           <span>Don't have an account?</span>
-          <a (click)="goToRegister()" (keydown.enter)="goToRegister()" (keydown.space)="goToRegister(); $event.preventDefault()" class="link" tabindex="0" role="button">Sign up</a>
+          <button type="button" (click)="goToRegister()" class="link">Sign up</button>
         </div>
       </mat-card-footer>
     </mat-card>
