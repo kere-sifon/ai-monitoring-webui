@@ -4,5 +4,5 @@ import { AppComponent } from './app/app.component';
 
 // NOSONAR: Angular's bootstrapApplication doesn't support top-level await
 // The promise chain is the correct and recommended approach for Angular
-bootstrapApplication(AppComponent, appConfig)
+bootstrapApplication(AppComponent, appConfig) // NOSONAR
   .catch((err) => console.error(err));

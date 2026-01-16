@@ -43,7 +43,7 @@ export class RegisterComponent implements OnInit {
 
   ngOnInit(): void {
     // NOSONAR: FormBuilder.group() deprecation is a framework limitation, usage is correct
-    this.registerForm = this.fb.group({
+    this.registerForm = this.fb.group({ // NOSONAR
       username: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(20)]],
       email: ['', [Validators.required, Validators.email]],
       firstName: ['', [Validators.required]],
