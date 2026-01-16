@@ -40,14 +40,14 @@ export class LoginComponent implements OnInit, OnDestroy {
   isLoading = false;
   hidePassword = true;
   returnUrl = '/dashboard';
-  private destroy$ = new Subject<void>();
+  private readonly destroy$ = new Subject<void>();
 
   constructor(
-    private fb: FormBuilder,
-    private authService: AuthService,
-    private router: Router,
-    private route: ActivatedRoute,
-    private snackBar: MatSnackBar
+    private readonly fb: FormBuilder,
+    private readonly authService: AuthService,
+    private readonly router: Router,
+    private readonly route: ActivatedRoute,
+    private readonly snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {

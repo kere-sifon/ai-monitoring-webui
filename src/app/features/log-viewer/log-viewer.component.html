@@ -153,10 +153,10 @@
       <tr mat-row *matRowDef="let row; columns: displayedColumns;" 
           class="log-row" 
           (click)="viewLogDetail(row)"
-          role="button"
           tabindex="0"
           (keydown.enter)="viewLogDetail(row)"
-          (keydown.space)="viewLogDetail(row)">
+          (keydown.space)="viewLogDetail(row); $event.preventDefault()"
+          [attr.aria-label]="'View details for log entry from ' + row.service">
       </tr>
 
       <!-- No Data Row -->
