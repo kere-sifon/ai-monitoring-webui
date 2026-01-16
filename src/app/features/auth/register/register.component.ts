@@ -47,7 +47,9 @@ export class RegisterComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       firstName: ['', [Validators.required]],
       lastName: ['', [Validators.required]],
-      password: ['', [Validators.required, Validators.minLength(6)]], // NOSONAR: S2068 - Form field initialization, not a hard-coded password
+      // eslint-disable-next-line @typescript-eslint/no-hardcoded-password
+      // NOSONAR
+      password: ['', [Validators.required, Validators.minLength(6)]], // Form field initialization, not a hard-coded password
       confirmPassword: ['', [Validators.required]]
     }, { validators: this.passwordMatchValidator });
   }
@@ -63,7 +65,7 @@ export class RegisterComponent implements OnInit {
       this.loading = true;
       this.error = null;
 
-      const { confirmPassword, ...registerData } = this.registerForm.value;
+      const { confirmPassword: _confirmPassword, ...registerData } = this.registerForm.value;
       const request: RegisterRequest = registerData;
 
       this.authService.register(request).subscribe({

@@ -33,7 +33,7 @@ export class AppComponent implements OnInit {
     // Check if navigation should be shown based on route
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
-      .subscribe((event: any) => {
+      .subscribe((event: NavigationEnd) => {
         this.showNavigation = this.shouldShowNavigation(event.url);
       });
 

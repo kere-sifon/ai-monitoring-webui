@@ -25,7 +25,6 @@ import { LogService } from '../../core/services/log.service';
 import {
   LogEntry,
   LogLevel,
-  LogFilter,
   LogSearchRequest,
   LOG_LEVELS,
   LOG_LEVEL_COLORS

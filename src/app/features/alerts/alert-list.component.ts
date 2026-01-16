@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatTableModule } from '@angular/material/table';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
-import { MatSortModule, Sort } from '@angular/material/sort';
+import { MatSortModule } from '@angular/material/sort';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatChipsModule } from '@angular/material/chips';
@@ -105,7 +105,7 @@ export class AlertListComponent implements OnInit, OnDestroy {
           this.applyFilters();
           this.isLoading = false;
         },
-        error: (error) => {
+        error: (_error) => {
           this.showError('Failed to load alerts');
           this.isLoading = false;
         }

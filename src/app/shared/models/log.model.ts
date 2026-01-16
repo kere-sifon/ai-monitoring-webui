@@ -10,7 +10,7 @@ export interface LogEntry {
   message: string;
   environment?: string;
   host?: string;
-  metadata?: Record<string, any>;
+  metadata?: Record<string, unknown>;
 }
 
 export enum LogLevel {

@@ -58,7 +58,7 @@ export interface NotificationChannel {
   name: string;
   type: ChannelType;
   enabled: boolean;
-  config: Record<string, any>;
+  config: Record<string, unknown>;
   createdAt: Date;
   updatedAt: Date;
 }

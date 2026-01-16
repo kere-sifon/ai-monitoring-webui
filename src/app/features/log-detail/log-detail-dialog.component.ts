@@ -216,7 +216,7 @@ export class LogDetailDialogComponent {
   /**
    * Format metadata for display
    */
-  formatMetadata(metadata: Record<string, any>): string {
+  formatMetadata(metadata: Record<string, unknown>): string {
     return JSON.stringify(metadata, null, 2);
   }
 }

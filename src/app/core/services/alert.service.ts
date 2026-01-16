@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient, HttpParams, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, retry } from 'rxjs/operators';
 import { environment } from '../../../environments/environment';
@@ -245,7 +245,7 @@ export class AlertService {
   /**
    * Handle HTTP errors
    */
-  private handleError(error: any): Observable<never> {
+  private handleError(error: HttpErrorResponse): Observable<never> {
     let errorMessage = 'An error occurred';
 
     if (error.error instanceof ErrorEvent) {

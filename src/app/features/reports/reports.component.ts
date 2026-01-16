@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
@@ -35,7 +35,7 @@ import { FormsModule } from '@angular/forms';
   templateUrl: './reports.component.html',
   styleUrls: ['./reports.component.scss']
 })
-export class ReportsComponent implements OnInit {
+export class ReportsComponent {
   selectedReportType = 'summary';
   startDate?: Date;
   endDate?: Date;
@@ -49,10 +49,6 @@ export class ReportsComponent implements OnInit {
   ];
 
   constructor() {}
-
-  ngOnInit(): void {
-    // Initialize reports
-  }
 
   generateReport(): void {
     console.log('Generating report:', {

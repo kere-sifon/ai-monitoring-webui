@@ -61,8 +61,8 @@ export const roleGuard = (allowedRoles: string[]): CanActivateFn => {
  * Guest guard to prevent authenticated users from accessing login/register pages
  */
 export const guestGuard: CanActivateFn = (
-  route: ActivatedRouteSnapshot,
-  state: RouterStateSnapshot
+  _route: ActivatedRouteSnapshot,
+  _state: RouterStateSnapshot
 ) => {
   const authService = inject(AuthService);
   const router = inject(Router);

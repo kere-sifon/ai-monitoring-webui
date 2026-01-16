@@ -99,6 +99,7 @@ export class ChartConfigUtil {
         }]
       },
       options: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ...this.commonOptions as any,
         scales: {
           x: {
@@ -148,6 +149,7 @@ export class ChartConfigUtil {
           }
         },
         plugins: {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ...this.commonOptions.plugins as any,
           title: {
             display: true,
@@ -190,8 +192,10 @@ export class ChartConfigUtil {
         }]
       },
       options: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ...this.commonOptions as any,
         plugins: {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ...this.commonOptions.plugins as any,
           title: {
             display: true,
@@ -242,6 +246,7 @@ export class ChartConfigUtil {
         }]
       },
       options: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ...this.commonOptions as any,
         indexAxis: 'y',
         scales: {
@@ -292,6 +297,7 @@ export class ChartConfigUtil {
           }
         },
         plugins: {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ...this.commonOptions.plugins as any,
           title: {
             display: true,
@@ -344,6 +350,7 @@ export class ChartConfigUtil {
         ]
       },
       options: {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         ...this.commonOptions as any,
         scales: {
           x: {
@@ -401,6 +408,7 @@ export class ChartConfigUtil {
           }
         },
         plugins: {
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           ...this.commonOptions.plugins as any,
           title: {
             display: true,
@@ -416,8 +424,10 @@ export class ChartConfigUtil {
             }
           },
           tooltip: {
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             ...this.commonOptions.plugins?.tooltip as any,
             callbacks: {
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               label: function(context: any): string {
                 const label = context.dataset.label || '';
                 const score = context.parsed.y.toFixed(3);

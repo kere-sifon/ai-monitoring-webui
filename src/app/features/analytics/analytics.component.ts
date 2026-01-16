@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatCardModule } from '@angular/material/card';
@@ -31,13 +31,9 @@ import { MatNativeDateModule } from '@angular/material/core';
   templateUrl: './analytics.component.html',
   styleUrls: ['./analytics.component.scss']
 })
-export class AnalyticsComponent implements OnInit {
+export class AnalyticsComponent {
   selectedTimeRange = '7d';
   selectedService = 'all';
 
   constructor() {}
-
-  ngOnInit(): void {
-    // Initialize analytics data
-  }
 }
