@@ -180,6 +180,21 @@
   mat-divider {
     margin: 8px 0;
   }
+
+  // Animation
+  animation: slideDown 0.2s ease-out;
+}
+
+// Animation keyframes
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 // Responsive Design
@@ -201,21 +216,6 @@
   }
 }
 
-// Animation
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-// Merge duplicate selector with animation
-::ng-deep .user-menu {
-  animation: slideDown 0.2s ease-out;
-}
+// Animation keyframes moved above
 
 // Made with Bob
