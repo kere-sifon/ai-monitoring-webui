@@ -45,6 +45,19 @@ jobs:
       - name: Test
         run: npm run test -- --watch=false --browsers=ChromeHeadless --code-coverage
 
+      - name: Verify coverage file exists
+        id: coverage-check
+        run: |
+          if [ -f "coverage/lcov.info" ]; then
+            echo "exists=true" >> $GITHUB_OUTPUT
+            echo "Coverage file found at coverage/lcov.info"
+            ls -lh coverage/
+          else
+            echo "exists=false" >> $GITHUB_OUTPUT
+            echo "Coverage file not found. Checking for alternative locations..."
+            find . -name "lcov.info" -type f 2>/dev/null || echo "No lcov.info file found"
+          fi
+
       - name: Cache SonarCloud packages
         uses: actions/cache@v4
         with:
@@ -59,10 +72,15 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
       - name: Upload coverage to Codecov
+        if: steps.coverage-check.outputs.exists == 'true'
         uses: codecov/codecov-action@v4
         with:
           files: coverage/lcov.info
           fail_ci_if_error: false
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: unittests
+          name: codecov-umbrella
+          verbose: true
 
   # Builds Docker image on develop (with sha) or version tags (with semver)
   # DISABLED: Docker image building temporarily disabled
