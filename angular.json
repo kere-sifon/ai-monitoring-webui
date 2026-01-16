@@ -100,7 +100,16 @@
               "@angular/material/prebuilt-themes/purple-green.css",
               "src/styles.scss"
             ],
-            "scripts": []
+            "scripts": [],
+            "codeCoverage": true,
+            "codeCoverageExclude": [
+              "**/*.spec.ts",
+              "**/*.module.ts",
+              "**/main.ts",
+              "**/app.config.ts",
+              "**/app.routes.ts",
+              "**/environments/**"
+            ]
           }
         },
         "lint": {
