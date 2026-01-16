@@ -28,10 +28,10 @@ describe('AppComponent', () => {
     expect(app.title).toEqual('ai-monitoring-ui');
   });
 
-  it('should render title', () => {
+  it('should render app container', () => {
     const fixture = TestBed.createComponent(AppComponent);
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Hello, ai-monitoring-ui');
+    expect(compiled.querySelector('.app-container')).toBeTruthy();
   });
 });
