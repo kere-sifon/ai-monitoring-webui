@@ -49,21 +49,37 @@ jobs:
       - name: Verify coverage file exists
         id: coverage-check
         run: |
+          # Check for coverage file in common locations
+          COVERAGE_FILE=""
           if [ -f "coverage/lcov.info" ]; then
+            COVERAGE_FILE="coverage/lcov.info"
+          elif [ -f "coverage/ai-monitoring-ui/lcov.info" ]; then
+            COVERAGE_FILE="coverage/ai-monitoring-ui/lcov.info"
+          else
+            # Try to find it
+            COVERAGE_FILE=$(find . -name "lcov.info" -type f 2>/dev/null | head -n 1)
+          fi
+          
+          if [ -n "$COVERAGE_FILE" ] && [ -f "$COVERAGE_FILE" ]; then
             echo "exists=true" >> $GITHUB_OUTPUT
-            echo "Coverage file found at coverage/lcov.info"
+            echo "coverage_file=$COVERAGE_FILE" >> $GITHUB_OUTPUT
+            echo "Coverage file found at $COVERAGE_FILE"
             echo "File size:"
-            ls -lh coverage/lcov.info
+            ls -lh "$COVERAGE_FILE"
             echo "First 50 lines of coverage file:"
-            head -n 50 coverage/lcov.info || echo "File is empty or unreadable"
+            head -n 50 "$COVERAGE_FILE" || echo "File is empty or unreadable"
             echo "Coverage summary:"
-            grep -E "^SF:|^LF:|^LH:" coverage/lcov.info | head -n 10 || echo "No coverage data found"
+            grep -E "^SF:|^LF:|^LH:" "$COVERAGE_FILE" | head -n 10 || echo "No coverage data found"
           else
             echo "exists=false" >> $GITHUB_OUTPUT
             echo "Coverage file not found. Checking for alternative locations..."
             find . -name "lcov.info" -type f 2>/dev/null || echo "No lcov.info file found"
             echo "Checking coverage directory:"
             ls -la coverage/ 2>/dev/null || echo "Coverage directory does not exist"
+            if [ -d "coverage" ]; then
+              echo "Coverage directory contents:"
+              find coverage -type f -name "*.info" 2>/dev/null || echo "No .info files found"
+            fi
           fi
 
       - name: Cache SonarCloud packages
@@ -77,7 +93,8 @@ jobs:
         id: sonar-args
         run: |
           if [ "${{ steps.coverage-check.outputs.exists }}" == "true" ]; then
-            echo "args=-Dsonar.javascript.lcov.reportPaths=coverage/lcov.info -Dsonar.typescript.lcov.reportPaths=coverage/lcov.info -Dsonar.coverage.exclusions=**/*.spec.ts,**/*.test.ts,**/main.ts,**/app.config.ts,**/app.routes.ts,**/environments/**" >> $GITHUB_OUTPUT
+            COVERAGE_FILE="${{ steps.coverage-check.outputs.coverage_file }}"
+            echo "args=-Dsonar.javascript.lcov.reportPaths=$COVERAGE_FILE -Dsonar.typescript.lcov.reportPaths=$COVERAGE_FILE -Dsonar.coverage.exclusions=**/*.spec.ts,**/*.test.ts,**/main.ts,**/app.config.ts,**/app.routes.ts,**/environments/**" >> $GITHUB_OUTPUT
           else
             echo "args=-Dsonar.coverage.exclusions=**/*.spec.ts,**/*.test.ts,**/main.ts,**/app.config.ts,**/app.routes.ts,**/environments/**" >> $GITHUB_OUTPUT
           fi
@@ -94,7 +111,7 @@ jobs:
         if: steps.coverage-check.outputs.exists == 'true'
         uses: codecov/codecov-action@v4
         with:
-          files: coverage/lcov.info
+          files: ${{ steps.coverage-check.outputs.coverage_file }}
           fail_ci_if_error: false
           token: ${{ secrets.CODECOV_TOKEN }}
           flags: unittests
