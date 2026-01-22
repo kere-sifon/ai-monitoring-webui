@@ -70,12 +70,17 @@ The `.github/workflows/update-image-tag.yml` workflow automatically updates `val
      repository: ghcr.io/YOUR-ORG/YOUR-REPO
    ```
 
-2. **For repository dispatch triggers** (from image build workflow):
-   - Create a Personal Access Token with `repo` scope
-   - Add it as a secret named `DEPLOY_REPO_TOKEN` in the repository that builds the image
-   - Update `.github/workflows/example-image-build-trigger.yml` with your repository name
+2. **For repository dispatch triggers** (optional, but recommended):
+   - If you get "Resource not accessible by integration" errors, create a Personal Access Token (PAT):
+     - Go to GitHub Settings → Developer settings → Personal access tokens → Tokens (classic)
+     - Create a token with `repo` scope
+     - Add it as a secret named `REPO_DISPATCH_TOKEN` in your repository
+   - The workflow will use this token if available, otherwise fall back to `GITHUB_TOKEN`
+   - **Note**: The `workflow_run` fallback will still work even if repository_dispatch fails
 
-3. **Workflow permissions**: The workflow needs `contents: write` permission (already configured)
+3. **Workflow permissions**: 
+   - The `docker-build` job needs `contents: write` permission (already configured)
+   - The `update-image-tag` workflow needs `contents: write` permission (already configured)
 
 ## How It Works
 
