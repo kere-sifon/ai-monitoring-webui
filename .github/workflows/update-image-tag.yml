@@ -39,9 +39,9 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 0
-          # For workflow_run or repository_dispatch, checkout main branch (where we want to update values.yaml)
+          # For workflow_run or repository_dispatch, checkout develop branch (where we want to update values.yaml)
           # For manual dispatch, use the default branch
-          ref: ${{ (github.event_name == 'workflow_run' || github.event_name == 'repository_dispatch') && 'main' || github.ref }}
+          ref: ${{ (github.event_name == 'workflow_run' || github.event_name == 'repository_dispatch') && 'develop' || github.ref }}
       
       - name: Show checkout info
         run: |
@@ -238,16 +238,16 @@ jobs:
           # Commit and push
           git commit -m "chore: update image tag to ${{ steps.determine-tag.outputs.tag }} [auto-update]"
           
-          # Push to main branch (where values.yaml should be updated)
+          # Push to develop branch (where values.yaml should be updated)
           CURRENT_BRANCH=$(git branch --show-current)
           echo "Current branch: $CURRENT_BRANCH"
           
-          if [ "$CURRENT_BRANCH" != "main" ]; then
-            echo "Switching to main branch..."
-            git checkout -b main origin/main 2>/dev/null || git checkout main
+          if [ "$CURRENT_BRANCH" != "develop" ]; then
+            echo "Switching to develop branch..."
+            git checkout -b develop origin/develop 2>/dev/null || git checkout develop
           fi
           
-          git push origin main
+          git push origin develop
           
           echo "✓ Successfully updated and pushed values.yaml"
 
