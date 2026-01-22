@@ -12,7 +12,7 @@ from datetime import datetime
 from typing import List, Optional, Set
 
 
-def get_package_versions(repository: str, github_token: str) -> List[dict]:
+def get_package_versions(repository: str, github_token: str) -> tuple[List[dict], bool]:
     """
     Fetch all versions of a package from GHCR.
     
@@ -21,7 +21,7 @@ def get_package_versions(repository: str, github_token: str) -> List[dict]:
         github_token: GitHub token for authentication
         
     Returns:
-        List of package versions
+        Tuple of (list of package versions, is_user_owned)
     """
     # Extract owner and repo from repository path
     if repository.startswith('ghcr.io/'):
@@ -31,23 +31,43 @@ def get_package_versions(repository: str, github_token: str) -> List[dict]:
     
     owner, repo = repo_path.split('/', 1)
     
-    # GHCR API endpoint
-    url = f"https://api.github.com/orgs/{owner}/packages/container/{repo}/versions"
-    
+    # Try user endpoint first (for user-owned packages)
+    # If that fails with 404, try org endpoint
     headers = {
         'Accept': 'application/vnd.github.v3+json',
         'Authorization': f'token {github_token}',
     }
     
+    # Try user endpoint first
+    url = f"https://api.github.com/users/{owner}/packages/container/{repo}/versions"
+    
     try:
         response = requests.get(url, headers=headers, timeout=30)
         response.raise_for_status()
-        return response.json()
+        return response.json(), True  # is_user_owned = True
+    except requests.exceptions.HTTPError as e:
+        if e.response.status_code == 404:
+            # Try organization endpoint
+            url = f"https://api.github.com/orgs/{owner}/packages/container/{repo}/versions"
+            try:
+                response = requests.get(url, headers=headers, timeout=30)
+                response.raise_for_status()
+                return response.json(), False  # is_user_owned = False
+            except requests.exceptions.RequestException as e2:
+                print(f"Error fetching package versions (tried both user and org endpoints): {e2}", file=sys.stderr)
+                if hasattr(e2.response, 'text'):
+                    print(f"Response: {e2.response.text}", file=sys.stderr)
+                return [], True  # Default to user, but return empty list
+        else:
+            print(f"Error fetching package versions: {e}", file=sys.stderr)
+            if hasattr(e.response, 'text'):
+                print(f"Response: {e.response.text}", file=sys.stderr)
+            return [], True  # Default to user, but return empty list
     except requests.exceptions.RequestException as e:
         print(f"Error fetching package versions: {e}", file=sys.stderr)
         if hasattr(e.response, 'text'):
             print(f"Response: {e.response.text}", file=sys.stderr)
-        return []
+        return [], True  # Default to user, but return empty list
 
 
 def parse_version_tags(version: dict) -> Set[str]:
@@ -82,7 +102,7 @@ def should_keep_version(version: dict, keep_tags: Set[str], keep_latest: int, ve
     return False
 
 
-def delete_package_version(version_id: int, repository: str, github_token: str) -> bool:
+def delete_package_version(version_id: int, repository: str, github_token: str, is_user: bool = True) -> bool:
     """
     Delete a specific package version.
     
@@ -90,6 +110,7 @@ def delete_package_version(version_id: int, repository: str, github_token: str) 
         version_id: ID of the version to delete
         repository: Full repository path
         github_token: GitHub token for authentication
+        is_user: Whether the package is user-owned (True) or org-owned (False)
     """
     # Extract owner and repo
     if repository.startswith('ghcr.io/'):
@@ -99,7 +120,11 @@ def delete_package_version(version_id: int, repository: str, github_token: str) 
     
     owner, repo = repo_path.split('/', 1)
     
-    url = f"https://api.github.com/orgs/{owner}/packages/container/{repo}/versions/{version_id}"
+    # Use appropriate endpoint based on ownership
+    if is_user:
+        url = f"https://api.github.com/users/{owner}/packages/container/{repo}/versions/{version_id}"
+    else:
+        url = f"https://api.github.com/orgs/{owner}/packages/container/{repo}/versions/{version_id}"
     
     headers = {
         'Accept': 'application/vnd.github.v3+json',
@@ -147,11 +172,14 @@ def main():
     
     # Fetch all versions
     print("Fetching package versions...")
-    versions = get_package_versions(args.repository, github_token)
+    versions, is_user_owned = get_package_versions(args.repository, github_token)
     
     if not versions:
         print("No versions found or error fetching versions.")
         sys.exit(1)
+    
+    ownership_type = "user" if is_user_owned else "organization"
+    print(f"Package ownership: {ownership_type}")
     
     print(f"Found {len(versions)} versions")
     print()
@@ -204,7 +232,7 @@ def main():
         failed = 0
         
         for version_id, created_at, tags in to_delete:
-            if delete_package_version(version_id, args.repository, github_token):
+            if delete_package_version(version_id, args.repository, github_token, is_user_owned):
                 print(f"  ✓ Deleted version {version_id} ({tags})")
                 deleted += 1
             else:
