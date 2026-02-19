@@ -54,7 +54,6 @@ jobs:
             --failOnCVSS 7
             --enableRetired
             --suppression dependency-check-suppression.xml
-            --failOnError false
 
       - name: Upload Dependency-Check report
         if: always()
