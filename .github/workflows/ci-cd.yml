@@ -331,7 +331,7 @@ jobs:
           image-ref: '${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.scan-tag.outputs.tag }}'
           format: 'sarif'
           output: 'trivy-results.sarif'
-          trivyignores: '.trivyignore'
+          args: '--ignorefile .trivyignore'
 
       - name: Upload Trivy scan results
         uses: github/codeql-action/upload-sarif@v4
@@ -393,25 +393,34 @@ jobs:
       - name: Verify deployment
         run: |
           echo "Checking deployment status..."
-          kubectl rollout status deployment/ai-monitoring-webui-frontend -n ai-monitoring --timeout=2m
+          kubectl rollout status deployment/ai-monitoring-webui-frontend -n ai-monitoring --timeout=5m
           echo ""
           echo "Pods:"
-          kubectl get pods -n ai-monitoring -l app.kubernetes.io/instance=ai-monitoring-webui -o wide
+          kubectl get pods -n ai-monitoring -l app.kubernetes.io/name=frontend -o wide
           echo ""
           echo "Services:"
-          kubectl get svc -n ai-monitoring -l app.kubernetes.io/instance=ai-monitoring-webui
+          kubectl get svc -n ai-monitoring -l app.kubernetes.io/name=frontend
 
-      - name: Debug pod (on failure)
+      - name: Debug (on failure)
         if: failure()
         run: |
-          echo "=== Pod status ==="
-          kubectl get pods -n ai-monitoring -l app.kubernetes.io/instance=ai-monitoring-webui -o wide
+          echo "=== All pods in namespace ==="
+          kubectl get pods -n ai-monitoring -o wide
           echo ""
-          echo "=== Pod description ==="
-          kubectl describe pods -n ai-monitoring -l app.kubernetes.io/instance=ai-monitoring-webui
+          echo "=== Deployment status ==="
+          kubectl describe deployment ai-monitoring-webui-frontend -n ai-monitoring 2>/dev/null || true
           echo ""
-          echo "=== Pod logs (if any) ==="
-          kubectl logs -n ai-monitoring -l app.kubernetes.io/instance=ai-monitoring-webui --tail=100 --all-containers=true 2>/dev/null || true
+          echo "=== Recent events ==="
+          kubectl get events -n ai-monitoring --sort-by='.lastTimestamp' --field-selector type!=Normal 2>/dev/null | tail -30
+          echo ""
+          echo "=== Pod details (by label) ==="
+          kubectl describe pods -n ai-monitoring -l app.kubernetes.io/name=frontend 2>/dev/null || true
+          echo ""
+          echo "=== Pod logs ==="
+          for pod in $(kubectl get pods -n ai-monitoring -l app.kubernetes.io/name=frontend -o name 2>/dev/null); do
+            echo "--- $pod ---"
+            kubectl logs -n ai-monitoring $pod --tail=50 --all-containers=true 2>/dev/null || true
+          done
 
   helm-lint:
     runs-on: ubuntu-latest

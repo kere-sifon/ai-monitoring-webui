@@ -1,10 +1,13 @@
-replicaCount: 2
+replicaCount: 1
 
 image:
   repository: ghcr.io/keresifon/ai-monitoring-webui
   pullPolicy: IfNotPresent
   tag: "1.0.0"
 
+# For private GHCR images: create a docker-registry secret and set:
+# imagePullSecrets: [{ name: ghcr-pull-secret }]
+# Or make the package public in GitHub Package settings.
 imagePullSecrets: []
 nameOverride: ""
 fullnameOverride: ""
@@ -35,15 +38,15 @@ ingress:
 
 resources:
   limits:
-    cpu: 200m
-    memory: 128Mi
+    cpu: 500m
+    memory: 512Mi
   requests:
     cpu: 50m
-    memory: 64Mi
+    memory: 256Mi
 
 autoscaling:
   enabled: false
-  minReplicas: 2
+  minReplicas: 1
   maxReplicas: 10
   targetCPUUtilizationPercentage: 80
 
