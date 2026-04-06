@@ -112,6 +112,7 @@ jobs:
       # Use 12.x+: NVD API JSON can include CVSS v4 values (e.g. SAFETY) that 10.0.x cannot parse → UpdateException.
       # Do NOT bind-mount --data from the workspace: H2/Lucene on GHA overlay often hits "exclusive lock" / empty DB.
       # Keep ODC data under /tmp inside the container only (ephemeral; NVD downloads each run, ~10–25+ min).
+      # JSON report: HTML generation can fail with exit 12 on large node scans (Velocity); JSON is reliable for CI gating.
       # Fails build on CVSS >= 7. Set repo secret NVD_API_KEY (exact name). Fork PRs get an empty secret unless you use pull_request_target.
       - name: OWASP Dependency-Check (CVE scan)
         env:
@@ -123,14 +124,14 @@ jobs:
           odc_scan() {
             # Pass key explicitly: bare `-e NVD_API_KEY` can omit empty values; `--nvdApiKey` ensures the CLI sees it.
             docker run --rm \
-              -e JAVA_OPTS="-Xmx4096m" \
+              -e JAVA_OPTS="-Xmx6144m" \
               -e "NVD_API_KEY=${NVD_API_KEY}" \
               -v "$PWD:/src:rw" \
               owasp/dependency-check:12.2.0 \
               --data /tmp/odc-data \
               --nvdApiKey "${NVD_API_KEY}" \
               --scan /src \
-              --format HTML \
+              --format JSON \
               --out /src/reports \
               --project "ai-monitoring-webui" \
               --failOnCVSS 7 \
@@ -140,11 +141,7 @@ jobs:
           }
 
           echo "Starting OWASP Dependency-Check (NVD/CPE update can be quiet 10–25+ min)."
-          if ! odc_scan; then
-            echo "Dependency-Check failed; retrying once after 45s (often NVD/transient)."
-            sleep 45
-            odc_scan
-          fi
+          odc_scan
 
       - name: Upload Dependency-Check report
         if: always()
