@@ -124,6 +124,7 @@ jobs:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
         run: |
           mkdir -p reports dependency-check-data
+          echo "Starting OWASP Dependency-Check (after image pull: NVD/CPE DB update can take 10–25+ min on cold cache; logs follow)."
           docker run --rm \
             -e JAVA_OPTS="-Xmx4096m" \
             -e NVD_API_KEY \
@@ -137,7 +138,8 @@ jobs:
             --project "ai-monitoring-webui" \
             --failOnCVSS 7 \
             --enableRetired \
-            --suppression /src/dependency-check-suppression.xml
+            --suppression /src/dependency-check-suppression.xml \
+            --verbose
 
       - name: Upload Dependency-Check report
         if: always()
