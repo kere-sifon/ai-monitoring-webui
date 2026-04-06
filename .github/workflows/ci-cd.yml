@@ -112,25 +112,26 @@ jobs:
       # Use 12.x+: NVD API JSON can include CVSS v4 values (e.g. SAFETY) that 10.0.x cannot parse → UpdateException.
       # Do NOT bind-mount --data from the workspace: H2/Lucene on GHA overlay often hits "exclusive lock" / empty DB.
       # Keep ODC data under /tmp inside the container only (ephemeral; NVD downloads each run, ~10–25+ min).
-      # JSON report: HTML generation can fail with exit 12 on large node scans (Velocity); JSON is reliable for CI gating.
+      # Scan package.json + package-lock.json only — not the whole tree (node_modules). Full-repo scans are huge and often hit exit 12 during report generation.
       # Fails build on CVSS >= 7. Set repo secret NVD_API_KEY (exact name). Fork PRs get an empty secret unless you use pull_request_target.
+
+
       - name: OWASP Dependency-Check (CVE scan)
         env:
-          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
-        run: |
-          set -euo pipefail
-          mkdir -p reports
-
-          odc_scan() {
-            # Pass key explicitly: bare `-e NVD_API_KEY` can omit empty values; `--nvdApiKey` ensures the CLI sees it.
+            NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+          run: |
+            set -euo pipefail
+            mkdir -p reports
+        
             docker run --rm \
-              -e JAVA_OPTS="-Xmx6144m" \
+              -e "ODC_OPTS=-Xmx4096m" \
               -e "NVD_API_KEY=${NVD_API_KEY}" \
               -v "$PWD:/src:rw" \
               owasp/dependency-check:12.2.0 \
               --data /tmp/odc-data \
               --nvdApiKey "${NVD_API_KEY}" \
-              --scan /src \
+              --scan /src/package.json \
+              --scan /src/package-lock.json \
               --format JSON \
               --out /src/reports \
               --project "ai-monitoring-webui" \
@@ -138,10 +139,6 @@ jobs:
               --enableRetired \
               --suppression /src/dependency-check-suppression.xml \
               --log /src/reports/dependency-check.log
-          }
-
-          echo "Starting OWASP Dependency-Check (NVD/CPE update can be quiet 10–25+ min)."
-          odc_scan
 
       - name: Upload Dependency-Check report
         if: always()
