@@ -118,27 +118,27 @@ jobs:
 
       - name: OWASP Dependency-Check (CVE scan)
         env:
-            NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
-          run: |
-            set -euo pipefail
-            mkdir -p reports
-        
-            docker run --rm \
-              -e "ODC_OPTS=-Xmx4096m" \
-              -e "NVD_API_KEY=${NVD_API_KEY}" \
-              -v "$PWD:/src:rw" \
-              owasp/dependency-check:12.2.0 \
-              --data /tmp/odc-data \
-              --nvdApiKey "${NVD_API_KEY}" \
-              --scan /src/package.json \
-              --scan /src/package-lock.json \
-              --format JSON \
-              --out /src/reports \
-              --project "ai-monitoring-webui" \
-              --failOnCVSS 7 \
-              --enableRetired \
-              --suppression /src/dependency-check-suppression.xml \
-              --log /src/reports/dependency-check.log
+          NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
+        run: |
+          set -euo pipefail
+          mkdir -p reports
+
+          docker run --rm \
+            -e JAVA_OPTS="-Xmx8192m" \
+            -e "NVD_API_KEY=${NVD_API_KEY}" \
+            -v "$PWD:/src:rw" \
+            owasp/dependency-check:12.2.0 \
+            --data /tmp/odc-data \
+            --nvdApiKey "${NVD_API_KEY}" \
+            --scan /src/package.json \
+            --scan /src/package-lock.json \
+            --format JSON \
+            --out /src/reports \
+            --project "ai-monitoring-webui" \
+            --failOnCVSS 7 \
+            --enableRetired \
+            --suppression /src/dependency-check-suppression.xml \
+            --log /src/reports/dependency-check.log
 
       - name: Upload Dependency-Check report
         if: always()
