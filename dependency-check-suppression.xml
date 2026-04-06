@@ -93,35 +93,41 @@
     </suppress>
 
     <!-- tuf-js, @sigstore/tuf - Transitive from @angular-devkit. Dev/build-time. -->
+    <!-- Schema 1.3 requires at least one of cpe/cve/vulnerabilityName/cwe/cvssBelow after packageUrl. -->
     <suppress until="2026-06-01Z">
         <notes><![CDATA[
         tuf-js. Transitive from @sigstore/tuf. Build-time only. Re-evaluate on Angular upgrade.
         ]]></notes>
         <packageUrl regex="true">^pkg:npm/tuf-js@.*$</packageUrl>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
     </suppress>
     <suppress until="2026-06-01Z">
         <notes><![CDATA[
         @sigstore/tuf. Transitive from Angular tooling. Build-time only.
         ]]></notes>
         <packageUrl regex="true">^pkg:npm/%40sigstore%2Ftuf@.*$</packageUrl>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
     </suppress>
     <suppress until="2026-06-01Z">
         <notes><![CDATA[
         make-fetch-happen. Transitive from tuf-js. Build-time only.
         ]]></notes>
         <packageUrl regex="true">^pkg:npm/make-fetch-happen@.*$</packageUrl>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
     </suppress>
     <suppress until="2026-06-01Z">
         <notes><![CDATA[
         external-editor. Transitive via inquirer. Dev-time only.
         ]]></notes>
         <packageUrl regex="true">^pkg:npm/external-editor@.*$</packageUrl>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
     </suppress>
     <suppress until="2026-06-01Z">
         <notes><![CDATA[
         inquirer. Transitive. Dev-time only.
         ]]></notes>
         <packageUrl regex="true">^pkg:npm/inquirer@.*$</packageUrl>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
     </suppress>
 
     <!-- tar - Path traversal/symlink. Override to ^7.5.8 in package.json. Run npm install to apply. -->
