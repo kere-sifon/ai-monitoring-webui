@@ -111,7 +111,7 @@ jobs:
       # OWASP Dependency-Check: official image + pinned tag (not Dependency-Check_Action@main).
       # Do NOT bind-mount --data from the workspace: H2/Lucene on GHA overlay often hits "exclusive lock" / empty DB.
       # Keep ODC data under /tmp inside the container only (ephemeral; NVD downloads each run, ~10–25+ min).
-      # Fails build on CVSS >= 7. Set NVD_API_KEY repo secret to avoid NVD rate limits / failed updates.
+      # Fails build on CVSS >= 7. Set repo secret NVD_API_KEY (exact name). Fork PRs get an empty secret unless you use pull_request_target.
       - name: OWASP Dependency-Check (CVE scan)
         env:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
@@ -120,12 +120,14 @@ jobs:
           mkdir -p reports
 
           odc_scan() {
+            # Pass key explicitly: bare `-e NVD_API_KEY` can omit empty values; `--nvdApiKey` ensures the CLI sees it.
             docker run --rm \
               -e JAVA_OPTS="-Xmx4096m" \
-              -e NVD_API_KEY \
+              -e "NVD_API_KEY=${NVD_API_KEY}" \
               -v "$PWD:/src:rw" \
               owasp/dependency-check:10.0.4 \
               --data /tmp/odc-data \
+              --nvdApiKey "${NVD_API_KEY}" \
               --scan /src \
               --format HTML \
               --out /src/reports \
