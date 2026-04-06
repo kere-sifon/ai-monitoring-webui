@@ -27,6 +27,7 @@ Thumbs.db
 
 # OWASP Dependency-Check output
 reports/
+dependency-check-data/
 
 # Coverage
 coverage/

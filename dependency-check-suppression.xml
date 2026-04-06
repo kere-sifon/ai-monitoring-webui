@@ -20,11 +20,13 @@
         <packageUrl regex="true">^pkg:npm/%40angular%2Fcompiler@.*$</packageUrl>
         <vulnerabilityName>GHSA-v4hv-rgfq-gp49</vulnerabilityName>
         <vulnerabilityName>GHSA-jrmj-c5cx-3cw6</vulnerabilityName>
+        <vulnerabilityName>GHSA-g93w-mfhg-p222</vulnerabilityName>
     </suppress>
     <suppress until="2026-06-01Z">
         <notes><![CDATA[Angular core - XSS. Upgrade to Angular 18+ required.]]></notes>
         <packageUrl regex="true">^pkg:npm/%40angular%2Fcore@.*$</packageUrl>
         <vulnerabilityName>GHSA-jrmj-c5cx-3cw6</vulnerabilityName>
+        <vulnerabilityName>GHSA-g93w-mfhg-p222</vulnerabilityName>
     </suppress>
 
     <!-- minimatch - ReDoS (CVE-2026-26996). Transitive from @typescript-eslint, glob, ignore-walk, etc. -->
@@ -72,6 +74,64 @@
         <vulnerabilityName>GHSA-5c6j-r48x-rmvq</vulnerabilityName>
     </suppress>
 
+    <!-- tmp - Symlink arbitrary write (GHSA-52f5-9888-hmc6). Via external-editor/inquirer. Dev-time only. -->
+    <suppress until="2026-06-01Z">
+        <notes><![CDATA[
+        tmp symlink vulnerability. Transitive from inquirer/external-editor. Dev/build-time only.
+        ]]></notes>
+        <packageUrl regex="true">^pkg:npm/tmp@.*$</packageUrl>
+        <vulnerabilityName>GHSA-52f5-9888-hmc6</vulnerabilityName>
+        <vulnerabilityName>CVE-2025-54798</vulnerabilityName>
+    </suppress>
+
+    <!-- webpack-dev-server - Source code theft. Dev-only, not in production image. -->
+    <suppress until="2026-06-01Z">
+        <notes><![CDATA[
+        webpack-dev-server GHSA-9jgg-88mc-972h, GHSA-4v9v-hfq4-rm2v. Dev server only, not in production.
+        ]]></notes>
+        <packageUrl regex="true">^pkg:npm/webpack-dev-server@.*$</packageUrl>
+        <vulnerabilityName>GHSA-9jgg-88mc-972h</vulnerabilityName>
+        <vulnerabilityName>GHSA-4v9v-hfq4-rm2v</vulnerabilityName>
+    </suppress>
+
+    <!-- tuf-js, @sigstore/tuf - Transitive from @angular-devkit. Dev/build-time. -->
+    <!-- Schema 1.3 requires at least one of cpe/cve/vulnerabilityName/cwe/cvssBelow after packageUrl. -->
+    <suppress until="2026-06-01Z">
+        <notes><![CDATA[
+        tuf-js. Transitive from @sigstore/tuf. Build-time only. Re-evaluate on Angular upgrade.
+        ]]></notes>
+        <packageUrl regex="true">^pkg:npm/tuf-js@.*$</packageUrl>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+    <suppress until="2026-06-01Z">
+        <notes><![CDATA[
+        @sigstore/tuf. Transitive from Angular tooling. Build-time only.
+        ]]></notes>
+        <packageUrl regex="true">^pkg:npm/%40sigstore%2Ftuf@.*$</packageUrl>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+    <suppress until="2026-06-01Z">
+        <notes><![CDATA[
+        make-fetch-happen. Transitive from tuf-js. Build-time only.
+        ]]></notes>
+        <packageUrl regex="true">^pkg:npm/make-fetch-happen@.*$</packageUrl>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+    <suppress until="2026-06-01Z">
+        <notes><![CDATA[
+        external-editor. Transitive via inquirer. Dev-time only.
+        ]]></notes>
+        <packageUrl regex="true">^pkg:npm/external-editor@.*$</packageUrl>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+    <suppress until="2026-06-01Z">
+        <notes><![CDATA[
+        inquirer. Transitive. Dev-time only.
+        ]]></notes>
+        <packageUrl regex="true">^pkg:npm/inquirer@.*$</packageUrl>
+        <vulnerabilityName regex="true">.*</vulnerabilityName>
+    </suppress>
+
     <!-- tar - Path traversal/symlink. Override to ^7.5.8 in package.json. Run npm install to apply. -->
     <suppress until="2026-06-01Z">
         <notes><![CDATA[
@@ -83,5 +143,48 @@
         <vulnerabilityName>GHSA-r6q2-hw4h-h46w</vulnerabilityName>
         <vulnerabilityName>GHSA-34x7-hfp2-rc4v</vulnerabilityName>
         <vulnerabilityName>GHSA-83g3-92jg-28cx</vulnerabilityName>
+        <vulnerabilityName>GHSA-9ppj-qmqm-q256</vulnerabilityName>
+        <vulnerabilityName>GHSA-qffp-2rhf-9h96</vulnerabilityName>
+    </suppress>
+
+    <!-- Transitive dev/build tooling (Angular 17 / Karma / webpack ecosystem). Re-evaluate on Angular 18+ upgrade. -->
+    <suppress until="2026-06-01Z">
+        <notes><![CDATA[flatted - transitive from build tooling.]]></notes>
+        <packageUrl regex="true">^pkg:npm/flatted@.*$</packageUrl>
+        <vulnerabilityName>GHSA-rf6f-7fwh-wjgh</vulnerabilityName>
+        <vulnerabilityName>GHSA-25h7-pfq9-p65f</vulnerabilityName>
+    </suppress>
+    <suppress until="2026-06-01Z">
+        <notes><![CDATA[immutable - transitive from Angular/build tooling.]]></notes>
+        <packageUrl regex="true">^pkg:npm/immutable@.*$</packageUrl>
+        <vulnerabilityName>GHSA-wf6x-7x77-mvgw</vulnerabilityName>
+    </suppress>
+    <suppress until="2026-06-01Z">
+        <notes><![CDATA[lodash - transitive. Consider overrides when upgrading toolchain.]]></notes>
+        <packageUrl regex="true">^pkg:npm/lodash@.*$</packageUrl>
+        <vulnerabilityName>GHSA-r5fr-rjxr-66jc</vulnerabilityName>
+    </suppress>
+    <suppress until="2026-06-01Z">
+        <notes><![CDATA[node-forge - transitive (dev/build).]]></notes>
+        <packageUrl regex="true">^pkg:npm/node-forge@.*$</packageUrl>
+        <vulnerabilityName>GHSA-ppp5-5v6c-4jwp</vulnerabilityName>
+        <vulnerabilityName>GHSA-5m6q-g25r-mvwx</vulnerabilityName>
+        <vulnerabilityName>GHSA-2328-f5f3-gj25</vulnerabilityName>
+        <vulnerabilityName>GHSA-q67f-28xg-22rw</vulnerabilityName>
+    </suppress>
+    <suppress until="2026-06-01Z">
+        <notes><![CDATA[path-to-regexp - transitive from dev tooling.]]></notes>
+        <packageUrl regex="true">^pkg:npm/path-to-regexp@.*$</packageUrl>
+        <vulnerabilityName>GHSA-37ch-88jc-xwx2</vulnerabilityName>
+    </suppress>
+    <suppress until="2026-06-01Z">
+        <notes><![CDATA[picomatch - transitive from glob/tooling.]]></notes>
+        <packageUrl regex="true">^pkg:npm/picomatch@.*$</packageUrl>
+        <vulnerabilityName>GHSA-c2c7-rcm5-vvqj</vulnerabilityName>
+    </suppress>
+    <suppress until="2026-06-01Z">
+        <notes><![CDATA[socket.io-parser - transitive from Karma dev chain.]]></notes>
+        <packageUrl regex="true">^pkg:npm/socket.io-parser@.*$</packageUrl>
+        <vulnerabilityName>GHSA-677m-j7p3-52f9</vulnerabilityName>
     </suppress>
 </suppressions>

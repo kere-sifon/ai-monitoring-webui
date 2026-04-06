@@ -3,7 +3,7 @@ replicaCount: 1
 image:
   repository: ghcr.io/keresifon/ai-monitoring-webui
   pullPolicy: IfNotPresent
-  tag: "1.0.3"
+  tag: "1.0.4"
 
 # For private GHCR images: create a docker-registry secret and set:
 # imagePullSecrets: [{ name: ghcr-pull-secret }]
@@ -63,3 +63,16 @@ readinessProbe:
     port: http
   initialDelaySeconds: 5
   periodSeconds: 5
+
+openshift:
+  enabled: false
+  route:
+    enabled: true
+    host: ""
+    annotations:
+      haproxy.router.openshift.io/timeout: 60s
+    tls:
+      enabled: true
+      termination: edge
+      insecureEdgeTerminationPolicy: Redirect
+      destinationCACertificate: ""
