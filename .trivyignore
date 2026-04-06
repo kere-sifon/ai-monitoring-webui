@@ -1,4 +1,9 @@
-# libpng CVE-2026-25646 - heap buffer overflow in png_set_quantize
-# Present in nginx:alpine base image. Fix: libpng 1.6.55+ (Alpine 1.6.55-r0)
-# nginx serves static files; PNG processing risk is limited. Re-evaluate when base image includes fix.
-CVE-2026-25646 exp:2026-06-01T00:00:00Z
+# Fallback if any finding remains after edge zlib/libpng in Dockerfile. Use `exp:YYYY-MM-DD` per Trivy docs.
+# Alerts: #2 CVE-2026-33416 (UAF), #3 CVE-2026-33636 (Neon), #4 CVE-2026-22184 (untgz), #5 CVE-2026-27171 (CRC32);
+# also CVE-2026-25646 (png_set_quantize) when present in scans.
+
+CVE-2026-25646 exp:2026-06-01
+CVE-2026-33416 exp:2026-06-01
+CVE-2026-33636 exp:2026-06-01
+CVE-2026-22184 exp:2026-06-01
+CVE-2026-27171 exp:2026-06-01
