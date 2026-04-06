@@ -108,36 +108,24 @@ jobs:
         run: npm audit --audit-level=critical
         continue-on-error: true
 
-      # OWASP Dependency-Check: use official image + pinned tag (not Dependency-Check_Action@main,
-      # which always passes --noupdate and can leave NVD/CPE data stale → "Exception occurred initializing CPE Analyzer").
-      # ODC H2/Lucene under dependency-check-data is fragile when cached (partial snapshots → lock / empty DB).
-      # Re-enable caching later with a new key (e.g. v5) if NVD download time is too high.
-      - name: Cache OWASP Dependency-Check data
-        uses: actions/cache@v4
-        with:
-          path: dependency-check-data
-          key: odc-data-${{ runner.os }}-v4
-          restore-keys: |
-            odc-data-${{ runner.os }}-v4-
-
-      # Fails build on CVSS >= 7. Set NVD_API_KEY repo secret or NVD updates may fail/rate-limit.
+      # OWASP Dependency-Check: official image + pinned tag (not Dependency-Check_Action@main).
+      # Do NOT bind-mount --data from the workspace: H2/Lucene on GHA overlay often hits "exclusive lock" / empty DB.
+      # Keep ODC data under /tmp inside the container only (ephemeral; NVD downloads each run, ~10–25+ min).
+      # Fails build on CVSS >= 7. Set NVD_API_KEY repo secret to avoid NVD rate limits / failed updates.
       - name: OWASP Dependency-Check (CVE scan)
         env:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
         run: |
           set -euo pipefail
-          mkdir -p reports dependency-check-data
-          # Stale H2 lock/trace files (interrupted job, bad cache snapshot) cause "exclusive lock" / empty DB.
-          find dependency-check-data -type f \( -name '*.lock.db' -o -name '*.trace.db' \) -delete 2>/dev/null || true
+          mkdir -p reports
 
           odc_scan() {
             docker run --rm \
               -e JAVA_OPTS="-Xmx4096m" \
               -e NVD_API_KEY \
               -v "$PWD:/src:rw" \
-              -v "$PWD/dependency-check-data:/odcdata" \
               owasp/dependency-check:10.0.4 \
-              --data /odcdata \
+              --data /tmp/odc-data \
               --scan /src \
               --format HTML \
               --out /src/reports \
@@ -148,15 +136,12 @@ jobs:
               --log /src/reports/dependency-check.log
           }
 
-          echo "Starting OWASP Dependency-Check (NVD/CPE update can be quiet 10–25+ min on cold cache)."
-          if odc_scan; then
-            exit 0
+          echo "Starting OWASP Dependency-Check (NVD/CPE update can be quiet 10–25+ min)."
+          if ! odc_scan; then
+            echo "Dependency-Check failed; retrying once after 45s (often NVD/transient)."
+            sleep 45
+            odc_scan
           fi
-          # Do not use --purge here: it exits non-zero when odc.mv.db is missing, which aborts under set -e before retry.
-          echo "Dependency-Check failed (e.g. H2 lock or empty DB). Wiping ODC data dir and retrying once."
-          rm -rf dependency-check-data
-          mkdir -p dependency-check-data
-          odc_scan
 
       - name: Upload Dependency-Check report
         if: always()
