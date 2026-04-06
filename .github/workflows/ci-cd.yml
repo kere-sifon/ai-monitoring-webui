@@ -108,21 +108,36 @@ jobs:
         run: npm audit --audit-level=critical
         continue-on-error: true
 
-      # OWASP Dependency-Check for CVE detection (matches log-processor)
-      # Fails build on CVSS >= 7. NVD_API_KEY in secrets reduces NVD rate-limiting.
+      # OWASP Dependency-Check: use official image + pinned tag (not Dependency-Check_Action@main,
+      # which always passes --noupdate and can leave NVD/CPE data stale → "Exception occurred initializing CPE Analyzer").
+      - name: Cache OWASP Dependency-Check data
+        uses: actions/cache@v4
+        with:
+          path: dependency-check-data
+          key: odc-data-${{ runner.os }}-v1
+          restore-keys: |
+            odc-data-${{ runner.os }}-
+
+      # Fails build on CVSS >= 7. NVD_API_KEY in repo secrets reduces NVD rate-limiting.
       - name: OWASP Dependency-Check (CVE scan)
-        uses: dependency-check/Dependency-Check_Action@main
         env:
           NVD_API_KEY: ${{ secrets.NVD_API_KEY }}
-        with:
-          project: 'ai-monitoring-webui'
-          path: '.'
-          format: 'HTML'
-          out: 'reports'
-          args: >
-            --failOnCVSS 7
-            --enableRetired
-            --suppression dependency-check-suppression.xml
+        run: |
+          mkdir -p reports dependency-check-data
+          docker run --rm \
+            -e JAVA_OPTS="-Xmx4096m" \
+            -e NVD_API_KEY \
+            -v "$PWD:/src:rw" \
+            -v "$PWD/dependency-check-data:/odcdata" \
+            owasp/dependency-check:10.0.4 \
+            --data /odcdata \
+            --scan /src \
+            --format HTML \
+            --out /src/reports \
+            --project "ai-monitoring-webui" \
+            --failOnCVSS 7 \
+            --enableRetired \
+            --suppression /src/dependency-check-suppression.xml
 
       - name: Upload Dependency-Check report
         if: always()
