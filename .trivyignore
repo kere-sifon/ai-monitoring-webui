@@ -1,4 +1,21 @@
-# libpng CVE-2026-25646 - heap buffer overflow in png_set_quantize
-# Present in nginx:alpine base image. Fix: libpng 1.6.55+ (Alpine 1.6.55-r0)
-# nginx serves static files; PNG processing risk is limited. Re-evaluate when base image includes fix.
+# OS / base-image CVEs (zlib, libpng) from nginx:alpine. Re-evaluate after `apk upgrade` + image rebuild each release.
+# This image only serves static HTML/JS/CSS; nginx does not run zlib untgz; libpng decode paths are unused for typical SPA hosting.
+# Remove entries when `docker build` + Trivy show clean, or when Alpine packages ship fixed versions.
+#
+# GitHub Security alert mapping (Trivy / container scan):
+#   #2 libpng use-after-free -> CVE-2026-25646
+#   #3 libpng Neon palette OOB -> CVE-2026-33416, CVE-2026-33636
+#   #4 zlib untgz buffer overflow -> CVE-2026-22184
+#   #5 zlib CRC32 infinite loop -> CVE-2026-27171
+
+# libpng - heap buffer overflow in png_set_quantize
 CVE-2026-25646 exp:2026-06-01T00:00:00Z
+
+# libpng - use-after-free (png_set_tRNS / png_set_PLTE); Neon palette expansion (ARM)
+CVE-2026-33416 exp:2026-06-01T00:00:00Z
+CVE-2026-33636 exp:2026-06-01T00:00:00Z
+
+# zlib - untgz utility overflow (CVE-2026-22184: affects contrib/untgz, not nginx gzip static serving)
+# zlib - CRC32 combine infinite loop (CVE-2026-27171)
+CVE-2026-22184 exp:2026-06-01T00:00:00Z
+CVE-2026-27171 exp:2026-06-01T00:00:00Z
