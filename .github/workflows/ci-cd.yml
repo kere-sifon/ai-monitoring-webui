@@ -466,10 +466,16 @@ jobs:
 
       - name: Clear stuck Helm release (if any)
         run: |
-          if helm list -n ai-monitoring 2>/dev/null | grep -q ai-monitoring-webui; then
-            echo "Clearing any pending Helm operation..."
-            helm rollback ai-monitoring-webui -n ai-monitoring 2>/dev/null || true
-            sleep 5
+          NS=ai-monitoring
+          if helm list -n "$NS" 2>/dev/null | grep -q ai-monitoring-webui; then
+            STATUS=$(helm status ai-monitoring-webui -n "$NS" 2>/dev/null | awk '/^STATUS:/{print $2}')
+            echo "Helm release status: ${STATUS:-unknown}"
+            case "$STATUS" in
+              pending-install|pending-upgrade|pending-rollback)
+                echo "Rolling back to clear stuck operation..."
+                helm rollback ai-monitoring-webui -n "$NS" --wait --timeout 5m
+                ;;
+            esac
           fi
 
       - name: Deploy with Helm
@@ -669,9 +675,16 @@ jobs:
 
       - name: Clear stuck Helm release (if any)
         run: |
-          if helm list -n ai-monitoring 2>/dev/null | grep -q ai-monitoring-webui; then
-            helm rollback ai-monitoring-webui -n ai-monitoring 2>/dev/null || true
-            sleep 5
+          NS=ai-monitoring
+          if helm list -n "$NS" 2>/dev/null | grep -q ai-monitoring-webui; then
+            STATUS=$(helm status ai-monitoring-webui -n "$NS" 2>/dev/null | awk '/^STATUS:/{print $2}')
+            echo "Helm release status: ${STATUS:-unknown}"
+            case "$STATUS" in
+              pending-install|pending-upgrade|pending-rollback)
+                echo "Rolling back to clear stuck operation..."
+                helm rollback ai-monitoring-webui -n "$NS" --wait --timeout 5m
+                ;;
+            esac
           fi
 
       - name: Deploy with Helm
